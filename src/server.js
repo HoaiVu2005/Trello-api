@@ -39,12 +39,12 @@ const START_SERVER = () => {
     inviteUserToBoardSocket(socket), inviteeResponseInviter(socket), commentToDifferentUser(socket)
   })
   if (env.BUILD_MODE === 'production') {
-    server.listen(env.APP_PORT, env.APP_HOST, () => {
-      console.log(`3. Production: Hello Vũ Đẹp Trai, Backend is running at https://${env.APP_HOST}:${env.APP_PORT}`)
+    server.listen(process.env.PORT, () => {
+      console.log(`3. Production: Hello Vũ Đẹp Trai, Backend is running sucessfully at Port: ${process.env.PORT}`)
     })
   } else {
-    server.listen(env.APP_PORT, env.APP_HOST, () => {
-      console.log(`3. Local Dev: Hello Vũ Đẹp Trai, Backend is running at https://${env.APP_HOST}:${env.APP_PORT}`)
+    server.listen(env.LOCAL_DEV_APP_PORT, env.LOCAL_DEV_APP_HOST, () => {
+      console.log(`3. Local Dev: Hello Vũ Đẹp Trai, Backend is running at https://${env.LOCAL_DEV_APP_HOST}:${env.LOCAL_DEV_APP_PORT}`)
     })
   }
 }
