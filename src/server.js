@@ -1,7 +1,5 @@
 /* eslint-disable no-console */
-import dns from 'node:dns' // Sử dụng require('node:dns') nếu dùng CommonJS
 
-dns.setServers(['8.8.8.8', '8.8.4.4'])
 import express from 'express'
 import { CONNECT_DB } from '~/config/mongodb'
 import { env } from '~/config/environment'
@@ -39,7 +37,8 @@ const START_SERVER = () => {
     inviteUserToBoardSocket(socket), inviteeResponseInviter(socket), commentToDifferentUser(socket)
   })
   if (env.BUILD_MODE === 'production') {
-    server.listen(process.env.PORT, () => {
+    const PORT = process.env.PORT || 8074
+    server.listen(PORT, '0.0.0.0', () => {
       console.log(`3. Production: Hello Vũ Đẹp Trai, Backend is running sucessfully at Port: ${process.env.PORT}`)
     })
   } else {
