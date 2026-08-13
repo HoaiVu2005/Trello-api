@@ -4,23 +4,30 @@ import { JwtToken } from '~/providers/JwtProvider'
 import ApiError from '~/utils/ApiError'
 
 const isAuthorized = async (req, res, next) => {
-  const clientAccessToken = req.cookies?.accessToken
-  // nếu nhw clientAccessToken ko tồn tại thì trả về lỗi
+  // 🌟 LẤY TOKEN TỪ HEADER AUTHORIZATION
+  // Frontend gửi dạng: "Bearer <token_string>"
+  const authHeader = req.headers.authorization
+  const clientAccessToken = authHeader && authHeader.startsWith('Bearer ')
+    ? authHeader.split(' ')[1]
+    : req.cookies?.accessToken // Fallback đọc từ cookie nếu có
+
+  // Nếu không tìm thấy accessToken ở cả Header lẫn Cookie
   if (!clientAccessToken) {
     next(new ApiError(StatusCodes.UNAUTHORIZED, 'Unauthorized! (token not found!)'))
     return
   }
-  try {
-    //  Bước 1: Thực hiện giải mã token xem có hợp lệ hay không
-    const accessTokenDecoded = await JwtToken.verifyToken(clientAccessToken, env.ACCESS_TOKEN_SECRECT_SIGNATURE)
-    // console.log('accessTokenDecoded:', accessTokenDecoded)
 
-    // Bước 2: Nếu như token hợp lệ, thì sẽ cần lưu thông tin giải mã được vào cái req.jwtDecoded, để sử dụng cho các tầng xử lý phía sau
+  try {
+    // Bước 1: Thực hiện giải mã token xem có hợp lệ hay không
+    const accessTokenDecoded = await JwtToken.verifyToken(clientAccessToken, env.ACCESS_TOKEN_SECRECT_SIGNATURE)
+
+    // Bước 2: Lưu thông tin giải mã được vào req.jwtDecoded
     req.jwtDecoded = accessTokenDecoded
-    // Bước 3: cho phép request đi tiếp
+
+    // Bước 3: Cho phép request đi tiếp
     next()
   } catch (error) {
-    // Nếu accessToken bị hết hạn cần trả về 1 cái lỗi GONE cho phía FE biết để gọi lại refreshToken
+    // Nếu accessToken bị hết hạn cần trả về mã 410 (GONE) để FE gọi refreshToken
     if (error?.message?.includes('jwt expired')) {
       next(new ApiError(StatusCodes.GONE, 'Need to refresh token!'))
       return
