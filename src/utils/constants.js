@@ -2,7 +2,7 @@ import { env } from '~/config/environment'
 
 export const WHITELIST_DOMAINS = [
   // 'http://localhost:5173'
-  'https://trello-web-u4hb.vercel.app'
+  'https://trello-web-rqmg.vercel.app'
 ]
 
 export const BOARD_TYPES = {
